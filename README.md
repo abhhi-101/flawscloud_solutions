@@ -200,20 +200,63 @@ After we have mounted the volume, we need to find the credentials
 Login using the credentials found and get to the next level
 
 ![access denied 5](./img/4-11.jpg)
+
+- **Mitigation:**
+
+AWS allows you to make snapshots of EC2's and databases (RDS). The main purpose for that is to make backups, but people sometimes use snapshots to get access back to their own EC2's when they forget the passwords. This also allows attackers to get access to things. Snapshots are normally restricted to your own account, so a possible attack would be an attacker getting access to an AWS key that allows them to start/stop and do other things with EC2's and then uses that to snapshot an EC2 and spin up an EC2 with that volume in your environment to get access to it. Like all backups, you need to be cautious about protecting them.
+
 ---
 
 ## Level: 5 - AWS Magic number
-- **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
+- **Vulnerability Title :** SSRF vulnerability at /proxy/ endpoint leads to internal files disclosure
 - **Description:**
 
 ![level 5](./img/5-1.jpg)
-  This level is buckets of fun, see if you can find the first sub-domain.
+  This EC2 has a simple HTTP only proxy on it. Here are some examples of it's usage:
 
-- **Step to find:** 
+    http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/flaws.cloud/
+    http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/summitroute.com/blog/feed.xml
+    http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/neverssl.com/ 
 
+See if you can use this proxy to figure out how to list the contents of the level6 bucket at level6-cc4c404a8a8b876167f5e70a7d8c9880.flaws.cloud that has a hidden directory in it. 
+
+When we visit http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/flaws.cloud/, we will be provided with the content of `flaws.cloud`
+
+Similarly, when we visit http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/neverssl.com/ , we get content of `neverssl.com`
+
+This flow indicated that the backend logic of the application is taking user input after `/proxy/` endpoint and sending the GET request to the provided URL
+
+![level 5](./img/5-3.jpg)
+
+So lets see the request in intercepting proxy (Burp Suite)
+
+![level 5](./img/5-4.jpg)
+
+the response we get
+
+![level 5](./img/5-5.jpg)
+
+So lets try if we can send the request to internal IP, in AWS the internal IP address is 169.254.169.254 
+
+![level 5](./img/5-6.jpg)
+
+We get the content of `iam` user
+
+Add the `AccessKeyId and SecretKeyId and Token` in `~/.aws/credentials --profile level5` file
+
+![level 5](./img/5-7.jpg)
+
+So, now we will try to access the files in s3 bucket
+
+> aws --profile level5 s3 ls level6-cc4c404a8a8b876167f5e70a7d8c9880.flaws.cloud
+
+![level 5](./img/5-8.jpg)
+> Visit http://level6-cc4c404a8a8b876167f5e70a7d8c9880.flaws.cloud/ddcc78ff
   
 - **Mitigation:**
+The IP address 169.254.169.254 is a magic IP in the cloud world. AWS, Azure, Google, DigitalOcean and others use this to allow cloud resources to find out metadata about themselves. Some, such as Google, have additional constraints on the requests, such as requiring it to use `Metadata-Flavor: Google` as an HTTP header and refusing requests with an `X-Forwarded-For` header. AWS has recently created a new IMDSv2 that requires special headers, a challenge and response, and other protections, but many AWS accounts may not have enforced it. If you can make any sort of HTTP request from an EC2 to that IP, you'll likely get back information the owner would prefer you not see. 
 
+Ensure your applications do not allow access to 169.254.169.254 or any local and private IP ranges. Additionally, ensure that IAM roles are restricted as much as possible.
 ---
 
 ## Level: 6 - AWS Policies

@@ -13,7 +13,9 @@
 ## Level: 1 - Enumerate AWS
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure at flaws.cloud
 - **Description:**
+- 
 ![level 1](./img/1.jpg)
+
 >  This level is buckets of fun, see if you can find the first sub-domain.
 
 This is the classic S3 bucket misconfigured permission issue. Anyone with a AWS account enumerate S3 bucket using AWS-cli tool.
@@ -56,10 +58,23 @@ By default, S3 buckets are private and secure when they are created. To allow it
 ![level 2](./img/2.0.jpg)
   > The next level is fairly similar, with a slight twist. You're going to need your own AWS account for this. You just need the free tier. 
 
+After we get our AWS-CLI installed, we can configure awscli to use our account. Refer to configure [AWS-cli](https://www.youtube.com/watch?v=BzzCIsjrE7U)
 
+Lets see if we can access the bucket with aws-cli 
+> aws s3 ls s3://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud/
 
+> aws s3 cp s3://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud/secret-e4443f.html . && cat secret-e4443f.html
+
+![aws cli](./img/2.jpg)
+
+we get next level url i.e., [http://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud/](http://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud/)
+
+![level 3](./img/2-1.jpg)
 
 - **Mitigation:**
+
+Similar to opening permissions to "Everyone", people accidentally open permissions to "Any Authenticated AWS User". They might mistakenly think this will only be users of their account, when in fact it means anyone that has an AWS account. 
+ *Only open permissions to specific AWS users.*
 
 ---
 
@@ -69,7 +84,7 @@ By default, S3 buckets are private and secure when they are created. To allow it
 
 ![level 3](./img/3.0.jpg)
   
-  This level is buckets of fun, see if you can find the first sub-domain.
+  The next level is fairly similar, with a slight twist. Time to find your first AWS key! I bet you'll find something that will let you list what other buckets are.
 `
 cp - to copy file from bucket or to bucket
 `

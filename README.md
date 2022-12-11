@@ -13,10 +13,11 @@
 ## Level: 1 - Enumerate AWS
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure at flaws.cloud
 - **Description:**
-  
+![level 1](./img/1.jpg)
 >  This level is buckets of fun, see if you can find the first sub-domain.
 
 This is the classic S3 bucket misconfigured permission issue. Anyone with a AWS account enumerate S3 bucket using AWS-cli tool.
+On AWS you can set up S3 buckets with all sorts of permissions and functionality including using them to host static files. A number of people accidentally open them up with permissions that are too loose. Just like how you shouldn't allow directory listings of web servers, you shouldn't allow bucket listings. 
 
 ```bash
 AWS-CLI commands used:
@@ -43,17 +44,21 @@ This issue can be mitigated by properly configuring s3 bucket permissions, regar
 
 If public, who can perform enumeration actions on the bucket like `ls, cp, mv` etc
 
+By default, S3 buckets are private and secure when they are created. To allow it to be accessed as a web page, I had turn on "Static Website Hosting" and changed the bucket policy to allow everyone "s3:GetObject" privileges, which is fine if you plan to publicly host the bucket as a web page. But then to introduce the flaw, I changed the permissions to add "Everyone" to have "List" permissions.
+
+![found level 2](./img/1-2.jpg)
 ---
 
 ## Level: 2 - Insecure s3 bucket 
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
 - **Description:**
-  
-  This level is buckets of fun, see if you can find the first sub-domain.
+ 
+![level 2](./img/2.0.jpg)
+  > The next level is fairly similar, with a slight twist. You're going to need your own AWS account for this. You just need the free tier. 
 
-- **Step to find:** 
 
-  
+
+
 - **Mitigation:**
 
 ---
@@ -61,6 +66,8 @@ If public, who can perform enumeration actions on the bucket like `ls, cp, mv` e
 ## Level: 3 - S3 bucket authentication AWS users 
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
 - **Description:**
+
+![level 3](./img/3.0.jpg)
   
   This level is buckets of fun, see if you can find the first sub-domain.
 `
@@ -77,7 +84,8 @@ cp - to copy file from bucket or to bucket
 ## Level: 4 - EC2 snapshot
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
 - **Description:**
-  
+
+![level 4](./img/4.jpg)
   This level is buckets of fun, see if you can find the first sub-domain.
 
 - **Step to find:** 
@@ -87,7 +95,8 @@ cp - to copy file from bucket or to bucket
 ## Level: 5 - AWS Magic number
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
 - **Description:**
-  
+
+![level 5](./img/5-1.jpg)
   This level is buckets of fun, see if you can find the first sub-domain.
 
 - **Step to find:** 
@@ -100,7 +109,9 @@ cp - to copy file from bucket or to bucket
 ## Level: 6 - AWS Policies
 - **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
 - **Description:**
-  
+
+![level 6](./img/6-0.jpg)
+
   This level is buckets of fun, see if you can find the first sub-domain.
 
 - **Step to find:** 

@@ -79,20 +79,67 @@ Similar to opening permissions to "Everyone", people accidentally open permissio
 ---
 
 ## Level: 3 - S3 bucket authentication AWS users 
-- **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
+- **Vulnerability Title :** Leaked AWS credentials are not rolled-out 
 - **Description:**
 
 ![level 3](./img/3.0.jpg)
   
   The next level is fairly similar, with a slight twist. Time to find your first AWS key! I bet you'll find something that will let you list what other buckets are.
-`
+```bash
+AWS command used:
+ls - to list bucket content
 cp - to copy file from bucket or to bucket
-`
+--recursive flag - to copy all files from directory
+```
+We also need `git` command line tool to read git commit made, which leaked AWS credentials
+```bash
+Git command used:
+log - to log all the commits made
+revert - to revert to any other commit
+```
 
-- **Step to find:** 
+> aws s3 ls s3://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud 
 
+We find a .git file, which indicates that the bucket is a github reposiroty, so to enumerate we will copy entire bucket in our local machine
+> aws s3 cp s3://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud ./level3 --recursive
+
+
+![git repo](./img/3-1.jpg)
+
+After we have copied all the files in our local machine directory, we can use `git` commands to enumerate the repo
+
+> cd ./level2
+
+> git log
+
+![git repo](./img/3-3.jpg)
+
+As we can see, we got a commit saying "accidentally added something I shouldn't have"
+
+We will revert back to the git to read what was added
+> git revert b64c8dcfa8a39af06521cf4cb7cdce5f0ca9e526
+
+![git repo](./img/3-4.jpg)
+
+and read the content of the file **access_keys.txt**
+> cat access_keys.txt 
+
+![git repo](./img/3-5.jpg)
   
+To get the Level 4 URL we need to add the aws configuration credentials to `aws config` file
+> aws config --profile level3
+
+Enter the Access_key and Secter_Key & Enumerate the bucket
+
+We can enumerate all s3 buckets that user has permissions to vist using, 
+> aws s3 ls
+
+![aws ls](./img/4-0.jpg)
+
 - **Mitigation:**
+People often leak AWS keys and then try to cover up their mistakes without revoking the keys. You should always revoke any AWS keys (or any secrets) that could have been leaked or were misplaced. Roll your secrets early and often. 
+
+Always roll your secrets if you suspect they were compromised or made public or stored or shared incorrectly. Roll early, roll often. Rolling secrets means that you revoke the keys (ie. delete them from the AWS account) and generate new ones. 
 
 ---
 

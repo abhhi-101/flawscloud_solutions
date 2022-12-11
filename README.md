@@ -74,4 +74,4 @@
 - **Mitigation:**
 
 ## Level: 7 - The end
-!(The end)[./img/6-7.jpg]
+![The end](/img/6-7.jpg)

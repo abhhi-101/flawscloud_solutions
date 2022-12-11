@@ -144,14 +144,62 @@ Always roll your secrets if you suspect they were compromised or made public or 
 ---
 
 ## Level: 4 - EC2 snapshot
-- **Vulnerability Title :** Insecure s3 bucket permissions leads to information discloure
+- **Vulnerability Title :** Public EC2 snapshot with server credentials
 - **Description:**
 
 ![level 4](./img/4.jpg)
-  This level is buckets of fun, see if you can find the first sub-domain.
+  For the next level, you need to get access to the web page running on an EC2 at 4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud
 
-- **Step to find:** 
+It'll be useful to know that a snapshot was made of that EC2 shortly after nginx was setup on it. 
 
+We cannot access next level without solving this challenge
+
+![access denied 5](./img/4-1.jpg)
+
+At the [http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/](http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/) we need login credentials
+
+![access denied 5](./img/4-2.jpg)
+
+So we will start with what we have!
+To access EC2 instance snapshot, we need some information like user-identity number, snapshot-id:
+> aws sts get-caller-identity --profile level3 
+
+![access denied 5](./img/4-3.jpg)
+> aws ec2 describe-snapshots --owner-ids 975426262029 --query 'Snapshots[]' --region us-west-2 --profile level3
+
+![access denied 5](./img/4-4.jpg)
+
+Now with all the required information, we will create a volume in our AWS account, and later attach the same volume with our instance
+> aws ec2 creat-volume --availability-zone us-west-2a --region us-west-2 -snapshot-id snap-0b49342abd1bdcb89 
+
+![access denied 5](./img/4-5.jpg)
+
+![access denied 5](./img/4-6.jpg)
+Now to use the volume, we need to create a EC2 instance and attach above created volume to our instance
+
+![access denied 5](./img/4-7.jpg)
+
+We have created the instance with vulnerable voulme attached, so start and instance and connect 
+
+![access denied 5](./img/4-8.jpg)
+
+To get the information from the volume, we need to mount it on our instance,
+> sudo mount /dev/xvdb1 /mnt
+
+![access denied 5](./img/4-9.jpg)
+
+After we have mounted the volume, we need to find the credentials
+> cd /mnt/home/ubuntu
+
+> cat setupNginx.sh
+
+![access denied 5](./img/4-10.jpg)
+
+`htpasswd -b /etc/nginx/.htpasswd flaws nCP8xigdjpjyiXgJ7nJu7rw5Ro68iE8M`
+
+Login using the credentials found and get to the next level
+
+![access denied 5](./img/4-11.jpg)
 ---
 
 ## Level: 5 - AWS Magic number

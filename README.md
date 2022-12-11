@@ -1,4 +1,4 @@
-# flaws.cloud Walkthrough
+# Flaws cloud - walkthrough ☁️
 :shipit: This is my version of [Flaws Cloud](https://flaws.cloud) challanges solution *(Level1-Level7)* 
 
 ![Home page intro](./img/0.jpg)

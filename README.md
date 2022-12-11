@@ -265,13 +265,46 @@ Ensure your applications do not allow access to 169.254.169.254 or any local and
 
 ![level 6](./img/6-0.jpg)
 
-  This level is buckets of fun, see if you can find the first sub-domain.
+  For this final challenge, you're getting a user access key that has the SecurityAudit policy attached to it. See what else it can do and what else you might find in this AWS account.
 
-- **Step to find:** 
+Access key ID: AKIAJFQ6E7BY57Q3OBGA
+Secret: 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
 
+Need a hint? Go to Hint 1
+
+We are given AWS credentials and we have to find a URL to complete the challenge
+
+We will start with adding the credentials in the `~/.aws/credentials/`
+
+> aws --profile level6 iam list-attached-user-policies --user-name Level6
+
+![level 6](./img/6-1.jpg)
+> aws --profile level6 iam get-policy --policy-arn arn:aws:iam::975426262029:policy/list_apigateways 
+
+![level 6](./img/6-2.jpg)
+> aws --profile level6 iam get-policy-version --policy-arn arn:aws:iam::975426262029:policy/list_apigateways --version-id v4
+
+![level 6](./img/6-3.jpg)
+> aws --region us-west-2 --profile level6 lambda list-functions
+
+![level 6](./img/6-4.jpg)
+> aws --region us-west-2 --profile level6 lambda get-policy --function-name Level6
+
+![level 6](./img/6-5.jpg)
+
+We get the URL [s33ppypa75.execute-api.us-west-2.amazonaws.com/Prod/level6](https://s33ppypa75.execute-api.us-west-2.amazonaws.com/Prod/level6)
+
+After visiting the above url, we are provieded with next challenge URL at is 
+
+![level 6](./img/6-6.jpg)
+
+Our challege END url is [http://theend-797237e8ada164bf9f12cebf93b282cf.flaws.cloud/d730aa2b/](http://theend-797237e8ada164bf9f12cebf93b282cf.flaws.cloud/d730aa2b/)
   
 - **Mitigation:**
 
+It is common to give people and entities read-only permissions such as the SecurityAudit policy. The ability to read your own and other's IAM policies can really help an attacker figure out what exists in your environment and look for weaknesses and mistakes.
+
+Don't hand out any permissions liberally, even permissions that only let you read meta-data or know what your permissions are. 
 ---
 
 ## Level: 7 - The end
